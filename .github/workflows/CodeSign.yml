@@ -22,8 +22,8 @@ jobs:
         password: ${{ secrets.REGISTRY_TOKEN }}
     - name: Sign image 
       run: |
-        pkcs11config getgrant --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
-        pkcs11config sync
+        /usr/local/bin/pkcs11config getgrant --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
+        /usr/local/bin/pkcs11config sync
         URI=`/usr/local/bin/cosign pkcs11-tool list-keys-uris --module-path /opt/venafi/codesign/lib/venafipkcs11.so --pin 1234|grep "URI:" | sed -e 's/URI://g'`
-        cosign sign --key $URI --tlog-upload=false --issue-certificate=false {{ env.IMAGE_NAME }}
-        pkcs11config revokegrant
+        /usr/local/bin/cosign sign --key $URI --tlog-upload=false --issue-certificate=false {{ env.IMAGE_NAME }}
+        /usr/local/bin/pkcs11config revokegrant
