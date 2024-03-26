@@ -13,6 +13,7 @@ env:
 jobs:
   sign:
     runs-on: [ self-hosted ]
+    environment: test
     steps:
     - name: Log into registry
       uses: docker/login-action@v1
