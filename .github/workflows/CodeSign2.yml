@@ -1,0 +1,32 @@
+name: CodeSign Protect Sign2
+on: workflow_dispatch
+ 
+env:
+  TPP_AUTH_URL: ${{ secrets.TPP_AUTH_URL }}
+  TPP_HSM_URL: ${{ secrets.TPP_HSM_URL }}
+  TPP_USERNAME: cosignkeyuser
+  TPP_PASSWORD: ${{ secrets.TPP_PASSWORD }}
+  IMAGE_NAME: dadsvacayshorts/bootcamp-signed
+  
+   
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  sign:
+    runs-on: [ self-hosted ]
+    environment: test
+    steps:
+    - name: Log into registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ secrets.ACR_ENDPOINT }}
+        username: ${{ secrets.REGISTRY_USER }}
+        password: ${{ secrets.REGISTRY_TOKEN }}
+    - name: Sign image 
+      run: |
+        /usr/local/bin/pkcs11config getgrant --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
+        /usr/local/bin/pkcs11config sync
+        echo about to sign image
+        echo image value ${{ env.IMAGE_NAME }}
+        URI=`/usr/local/bin/cosign pkcs11-tool list-keys-uris --module-path /opt/venafi/codesign/lib/venafipkcs11.so --pin 1234|grep "URI:" | sed -e 's/URI://g'`
+        /usr/local/bin/cosign sign --key $URI --tlog-upload=false --issue-certificate=false ${{ env.IMAGE_NAME }}
+        /usr/local/bin/pkcs11config revokegrant -force
