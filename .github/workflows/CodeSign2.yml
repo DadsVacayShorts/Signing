@@ -29,4 +29,5 @@ jobs:
         echo image value ${{ env.IMAGE_NAME }}
         URI=`/usr/local/bin/cosign pkcs11-tool list-keys-uris --module-path /opt/venafi/codesign/lib/venafipkcs11.so --pin 1234|grep "URI:" | sed -e 's/URI://g'`
         /usr/local/bin/cosign sign --key $URI --tlog-upload=false --issue-certificate=false ${{ env.IMAGE_NAME }}
+        /usr/local/bin/cosign verify --key $URI --insecure-ignore-tlog ${{ env.IMAGE_NAME }}
         /usr/local/bin/pkcs11config revokegrant -force
