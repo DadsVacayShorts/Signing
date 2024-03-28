@@ -12,7 +12,7 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   sign:
-    runs-on: [ self-hosted ]
+    runs-on: [self-hosted, signingserver]
     environment: test
     steps:
     - name: Log into registry
