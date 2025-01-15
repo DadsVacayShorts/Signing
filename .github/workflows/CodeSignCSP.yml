@@ -1,0 +1,31 @@
+name: CodeSign Protect Sign
+on: workflow_dispatch
+ 
+env:
+  TPP_AUTH_URL: https://tppserver.domain.com/vedauth
+  TPP_HSM_URL: https://tppserver.domain.com/vedhsm
+  TPP_CSC_URL: https://tppserver.domain.com/csc
+  TPP_USERNAME: codesignkeyuser
+  TPP_PASSWORD: ${{ secrets.TPP_PASSWORD }}
+  FILE_NAME: c:\software\file.exe
+  CERT_NAME: "Signer Subject"
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  sign:
+    runs-on: [ self-hosted ]
+    environment: test
+    steps:
+    - name: Install and configure CSP client
+      run: |
+          curl -o "VenafiCodeSigningClientsLatest-x64.msi" ${{ env.TPP_CSC_URL }}/clients/venafi-csc-latest-x86_64.msi
+          start /wait msiexec /qn /i "VenafiCodeSigningClientsLatest-x64.msi"
+          "c:\program files\venafi codesign protect\cspconfig.exe" version
+    - name: Sign image 
+      run: |
+       cspconfig getgrant --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
+        cspconfig sync
+        echo about to sign file
+        echo file value ${{ env.FILE_NAME }}
+        signtool sign /sm /fd sha256 /n ${{ env.CERT_NAME }} ${{ env.FILE_NAME }}
+        cspconfig revokegrant -force
