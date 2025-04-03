@@ -23,7 +23,7 @@ jobs:
           "c:\program files\venafi codesign protect\cspconfig.exe" version
     - name: Sign image 
       run: |
-       cspconfig getgrant --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
+       cspconfig getgrant --machine --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
         cspconfig sync
         echo about to sign file
         echo file value ${{ env.FILE_NAME }}
