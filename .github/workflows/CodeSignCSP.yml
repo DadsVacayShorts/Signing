@@ -24,7 +24,7 @@ jobs:
     - name: Sign image 
       run: |
        cspconfig getgrant --machine --force --authurl=${{ env.TPP_AUTH_URL }} --hsmurl=${{ env.TPP_HSM_URL }} --username=${{ env.TPP_USERNAME }} --password=${{ env.TPP_PASSWORD }}
-        cspconfig sync
+        cspconfig -machine sync
         echo about to sign file
         echo file value ${{ env.FILE_NAME }}
         signtool sign /sm /fd sha256 /n ${{ env.CERT_NAME }} ${{ env.FILE_NAME }}
